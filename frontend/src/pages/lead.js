@@ -62,7 +62,7 @@ function Leads() {
 
     }
 
-  }, []);
+  }, [currentUser.name, currentUser.role]);
 
   // ================= FETCH USERS =================
   const fetchUsers = useCallback(async () => {

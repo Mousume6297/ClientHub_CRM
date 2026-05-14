@@ -49,25 +49,23 @@ function LeadDetails() {
   // ================= FETCH FOLLOWUPS =================
   const fetchFollowups = useCallback(async () => {
 
-    try {
+  try {
 
-      const res = await fetch(
+    const res = await fetch(
+      `http://localhost:5000/api/followups/${id}`
+    );
 
-        `http://localhost:5000/api/followups/${id}`
+    const data = await res.json();
 
-      );
+    setFollowups(data);
 
-      const data = await res.json();
+  } catch (err) {
 
-      setFollowups(data);
+    console.log(err);
 
-    } catch (err) {
+  }
 
-      console.log(err);
-
-    }
-
-  }, []);
+}, [id]);
 
   // ================= FETCH LEAD =================
 useEffect(() => {
