@@ -1,207 +1,695 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Sidebar from "../components/sidebar";
 
-function Leads(){
+function Leads() {
 
-const [editingLead,setEditingLead] = useState(null);
-const [editName,setEditName] = useState("");
-const [editEmail,setEditEmail] = useState("");
-const [editSource,setEditSource] = useState("");
-const [leads,setLeads] = useState([]);
-const [search,setSearch] = useState("");
+  const navigate = useNavigate();
 
-useEffect(()=>{
-const storedLeads = JSON.parse(localStorage.getItem("leads")) || [];
-setLeads(storedLeads);
-},[]);
+  const [leads, setLeads] = useState([]);
 
-// ===== EDIT =====
-const startEdit = (lead)=>{
-setEditingLead(lead.id);
-setEditName(lead.name);
-setEditEmail(lead.email);
-setEditSource(lead.source);
-};
+  const [users, setUsers] = useState([]);
 
-const saveEdit = ()=>{
-const updatedLeads = leads.map((lead)=>{
-if(lead.id === editingLead){
-return {
-...lead,
-name:editName,
-email:editEmail,
-source:editSource
-};
-}
-return lead;
-});
-setLeads(updatedLeads);
-localStorage.setItem("leads",JSON.stringify(updatedLeads));
-setEditingLead(null);
-};
+  const [search, setSearch] = useState("");
 
-// ===== DELETE =====
-const deleteLead = (id) => {
-const updatedLeads = leads.filter((lead)=> lead.id !== id);
-setLeads(updatedLeads);
-localStorage.setItem("leads", JSON.stringify(updatedLeads));
-};
+  // ✅ STATUS FILTER
+  const [statusFilter, setStatusFilter] =
+    useState("All");
 
-// ===== STATUS =====
-const updateStatus = (id,newStatus)=>{
-const updatedLeads = leads.map((lead)=>{
-if(lead.id === id){
-return {...lead,status:newStatus};
-}
-return lead;
-});
-setLeads(updatedLeads);
-localStorage.setItem("leads",JSON.stringify(updatedLeads));
-};
+  // ✅ CURRENT USER
+  const currentUser =
+    JSON.parse(localStorage.getItem("crmUser")) || {};
 
-return(
+  const currentRole =
+    currentUser.role?.toLowerCase();
 
-<div className="dashboard-container">
+  const isViewer =
+    currentRole === "viewer";
 
-<Sidebar/>
+  // ================= FETCH LEADS =================
+  const fetchLeads = async () => {
 
-<div className="main-content">
+    try {
 
-<Navbar/>
+      const role =
+        currentUser.role?.toLowerCase();
 
-{/* ===== HEADER ===== */}
+      const userName =
+        currentUser.name;
+
+      const res = await fetch(
+
+`http://localhost:5000/api/leads?role=${role}&userName=${userName}`
+
+      );
+
+      if (!res.ok) {
+
+        console.log("Fetch failed");
+
+        return;
+
+      }
+
+      const data = await res.json();
+
+      setLeads(data);
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  // ================= FETCH USERS =================
+  const fetchUsers = async () => {
+
+    try {
+
+      const res = await fetch(
+        "http://localhost:5000/api/staff"
+      );
+
+      const data = await res.json();
+
+      setUsers(data.data || []);
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  useEffect(() => {
+
+    fetchLeads();
+
+    fetchUsers();
+
+  }, []);
+
+  // ================= DELETE LEAD =================
+  const deleteLead = async (id) => {
+
+    if (isViewer) {
+
+      alert("View only access");
+
+      return;
+
+    }
+
+    const confirmDelete =
+      window.confirm("Delete this lead?");
+
+    if (!confirmDelete) return;
+
+    try {
+
+      const res = await fetch(
+        `http://localhost:5000/api/leads/${id}`,
+        {
+
+          method: "DELETE",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            currentUserRole:
+              currentUser.role?.toLowerCase()
+          })
+
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+
+        alert("Lead deleted successfully ✅");
+
+        fetchLeads();
+
+      } else {
+
+        alert(data.message);
+
+      }
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert("Delete failed ❌");
+
+    }
+
+  };
+
+  // ================= UPDATE STATUS =================
+  const updateStatus = async (id, newStatus) => {
+
+    if (isViewer) {
+
+      alert("View only access");
+
+      return;
+
+    }
+
+    try {
+
+      await fetch(
+        `http://localhost:5000/api/leads/${id}/status`,
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            status: newStatus
+          })
+
+        }
+      );
+
+      fetchLeads();
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  // ================= ASSIGN LEAD =================
+  const assignLead = async (id, employee) => {
+
+    if (isViewer) {
+
+      alert("View only access");
+
+      return;
+
+    }
+
+    try {
+
+      await fetch(
+        `http://localhost:5000/api/leads/${id}/assign`,
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            assignedTo: employee
+          })
+
+        }
+      );
+
+      fetchLeads();
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  // ================= REJECT LEAD =================
+  const rejectLead = async (id, reason) => {
+
+    try {
+
+      await fetch(
+
+        `http://localhost:5000/api/leads/${id}/reject`,
+
+        {
+
+          method: "PUT",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            reason
+          })
+
+        }
+
+      );
+
+      alert("Lead rejected");
+
+      fetchLeads();
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  return (
+
+    <div className="dashboard-container">
+
+      <Sidebar />
+
+      <div className="main-content">
+
+        <Navbar />
+
+        {/* HEADER */}
 <div className="leads-header">
-  <h2 className="page-title">Leads</h2>
 
-  <input
-    type="text"
-    placeholder="Search leads..."
-    value={search}
-    onChange={(e)=>setSearch(e.target.value)}
-    className="search-box"
-  />
+  <h2 className="page-title">
+    Leads
+  </h2>
+
+  {/* RIGHT SIDE */}
+  <div className="leads-header-right">
+
+    {/* SEARCH */}
+    <input
+      type="text"
+      placeholder="Search leads..."
+      value={search}
+      onChange={(e) =>
+        setSearch(e.target.value)
+      }
+      className="search-box"
+    />
+
+    {/* STATUS FILTER */}
+    <select
+
+      value={statusFilter}
+
+      onChange={(e) =>
+        setStatusFilter(e.target.value)
+      }
+
+      className="filter-select"
+
+    >
+
+      <option value="All">
+        All Status
+      </option>
+
+      <option value="New">
+        New
+      </option>
+
+      <option value="Contacted">
+        Contacted
+      </option>
+
+      <option value="Converted">
+        Converted
+      </option>
+
+      <option value="Rejected">
+        Rejected
+      </option>
+
+    </select>
+
+  </div>
+
 </div>
 
-{/* ===== TABLE CARD ===== */}
+{/* TABLE */}
 <div className="leads-container">
 
-<table className="leads-table">
+  <table className="leads-table">
 
-<thead>
-<tr>
-<th>Name</th>
-<th>Email</th>
-<th>Source</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
+    <thead>
 
-<tbody>
+      <tr>
 
-{leads
-.filter((lead)=>
-lead.name.toLowerCase().includes(search.toLowerCase()) ||
-lead.email.toLowerCase().includes(search.toLowerCase()) ||
-lead.source.toLowerCase().includes(search.toLowerCase())
-)
-.map((lead)=>(
+        <th>Name</th>
 
-<tr key={lead.id}>
+        <th>Email</th>
 
-<td>
-{editingLead === lead.id ? (
-<input value={editName} onChange={(e)=>setEditName(e.target.value)} />
-) : (
-lead.name
-)}
-</td>
+        <th>Phone</th>
 
-<td>
-{editingLead === lead.id ? (
-<input value={editEmail} onChange={(e)=>setEditEmail(e.target.value)} />
-) : (
-lead.email
-)}
-</td>
+        <th>Source</th>
 
-<td>
-{editingLead === lead.id ? (
-<input value={editSource} onChange={(e)=>setEditSource(e.target.value)} />
-) : (
-lead.source
-)}
-</td>
+        <th>Status</th>
 
-<td>
-{/* ✅ STATUS BADGE + DROPDOWN */}
-<div className="status-wrapper">
+        <th>Assigned To</th>
 
-<span className={`status-badge ${lead.status.toLowerCase()}`}>
-  {lead.status}
-</span>
+        <th>Action</th>
 
-<select
-value={lead.status}
-onChange={(e)=>updateStatus(lead.id,e.target.value)}
-className="status-select"
->
-<option value="New">New</option>
-<option value="Contacted">Contacted</option>
-<option value="Converted">Converted</option>
-</select>
+      </tr>
 
-</div>
-</td>
+    </thead>
 
-<td>
+    <tbody>
 
-{editingLead === lead.id ? (
+      {
 
-<button className="save-btn" onClick={saveEdit}>
-Save
-</button>
+        leads
 
-) : (
+        .filter((lead) => {
 
-<>
+          // ✅ SEARCH
+          const matchesSearch =
 
+            (lead.name || "")
+              .toLowerCase()
+              .includes(search.toLowerCase())
+
+            ||
+
+            (lead.email || "")
+              .toLowerCase()
+              .includes(search.toLowerCase())
+
+            ||
+
+            (lead.source || "")
+              .toLowerCase()
+              .includes(search.toLowerCase());
+
+          // ✅ STATUS FILTER
+          const matchesStatus =
+
+            statusFilter === "All"
+
+            ||
+
+            lead.status === statusFilter;
+
+          return (
+            matchesSearch &&
+            matchesStatus
+          );
+
+        })
+
+        .map((lead) => (
+
+          <tr key={lead.id}>
+
+            {/* NAME */}
+            <td>
+              {lead.name || "-"}
+            </td>
+
+            {/* EMAIL */}
+            <td>
+              {lead.email || "-"}
+            </td>
+
+            {/* PHONE */}
+            <td>
+
+              {
+
+                lead.phone &&
+                lead.phone !== "null"
+
+                ?
+
+                lead.phone
+
+                :
+
+                "N/A"
+
+              }
+
+            </td>
+
+            {/* SOURCE */}
+            <td>
+              {lead.source || "-"}
+            </td>
+
+            {/* STATUS */}
+            <td>
+
+              <div className="status-wrapper">
+
+                <span
+                  className={`status-badge ${(lead.status || "new").toLowerCase()}`}
+                >
+
+                  {lead.status || "New"}
+
+                </span>
+
+                <select
+
+                  value={lead.status || "New"}
+
+                  disabled={isViewer}
+
+                  onChange={(e) =>
+                    updateStatus(
+                      lead.id,
+                      e.target.value
+                    )
+                  }
+
+                  className="status-select"
+
+                >
+
+                  <option value="New">
+                    New
+                  </option>
+
+                  <option value="Contacted">
+                    Contacted
+                  </option>
+
+                  <option value="Converted">
+                    Converted
+                  </option>
+
+                  <option value="Rejected">
+                    Rejected
+                  </option>
+
+                </select>
+
+              </div>
+
+                    </td>
+
+                    {/* ASSIGNED TO */}
+                    <td>
+
+                      {
+
+                        currentRole === "admin" ||
+
+                        currentRole === "manager"
+
+                        ?
+
+                        (
+
+                          <select
+
+                            value={lead.assigned_to || ""}
+
+                            disabled={isViewer}
+
+                            onChange={(e) =>
+                              assignLead(
+                                lead.id,
+                                e.target.value
+                              )
+                            }
+
+                          >
+
+                            <option value="">
+                              Select
+                            </option>
+
+                            {
+
+                              users
+
+                              .filter(
+
+                                (user) =>
+
+                                  user.role?.toLowerCase() !== "admin"
+
+                                  &&
+
+                                  user.role?.toLowerCase() !== "manager"
+
+                                  &&
+
+                                  user.role?.toLowerCase() !== "hr"
+
+                              )
+
+                              .map((user) => (
+
+                                <option
+                                  key={user.id}
+                                  value={user.name}
+                                >
+
+                                  {user.name} ({user.role})
+
+                                </option>
+
+                              ))
+
+                            }
+
+                          </select>
+
+                        )
+
+                        :
+
+                        (
+
+                          lead.assigned_to || "Not Assigned"
+
+                        )
+
+                      }
+
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td>
+
+                      <div className="action-buttons">
+
+                        {/* VIEW */}
+                        <button
+                          className="view-btn"
+                          onClick={() =>
+                            navigate(`/lead/${lead.id}`)
+                          }
+                        >
+                          View
+                        </button>
+
+                        {/* EDIT */}
 <button
-className="edit-btn"
-onClick={()=>startEdit(lead)}
+
+  className="edit-btn"
+
+  disabled={isViewer}
+
+  onClick={() =>
+    navigate(`/lead/${lead.id}`)
+  }
+
 >
-Edit
+
+  Edit
+
 </button>
+                        {/* REJECT */}
+                        <button
 
-<button
-className="delete-btn"
-onClick={()=>deleteLead(lead.id)}
->
-Delete
-</button>
+                          className="reject-btn"
 
-</>
+                          disabled={isViewer}
 
-)}
+                          onClick={() => {
 
-</td>
+                            const reason =
+                              prompt(
+                                "Enter rejection reason"
+                              );
 
-</tr>
+                            if (!reason) return;
 
-))}
+                            rejectLead(
+                              lead.id,
+                              reason
+                            );
 
-</tbody>
+                          }}
 
-</table>
+                        >
 
-</div>
+                          Reject
 
-</div>
+                        </button>
 
-</div>
+                        {/* DELETE */}
+                        <button
 
-);
+                          className="delete-btn"
+
+                          disabled={
+
+                            isViewer ||
+
+                            !["admin", "manager"].includes(
+                              currentRole
+                            )
+
+                          }
+
+                          onClick={() =>
+                            deleteLead(lead.id)
+                          }
+
+                        >
+
+                          Delete
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
 
 }
 

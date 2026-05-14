@@ -1,0 +1,243 @@
+.lead-details-container {
+  padding: 20px;
+}
+
+/* HEADER */
+.lead-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.lead-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* STATUS BADGE */
+.status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status.converted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status.contacted {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.new {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* CARD */
+.lead-card {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* GRID */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* NOTE INPUT */
+.note-input {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.note-input input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.note-input button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.note-input button:hover {
+  background: #4338ca;
+}
+
+/* NOTES */
+.notes-list {
+  list-style: none;
+  padding: 0;
+}
+
+.note-item {
+  background: #f3f4f6;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+/* HISTORY */
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-list li {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+/* ================= FOLLOWUP FORM ================= */
+
+.followup-form{
+
+display: flex;
+
+align-items: center;
+
+gap: 14px;
+
+flex-wrap: wrap;
+
+margin-top: 20px;
+
+}
+
+.followup-form input,
+
+.followup-form select,
+
+.followup-form textarea{
+
+padding: 12px 14px;
+
+border: 1px solid #dcdcdc;
+
+border-radius: 10px;
+
+font-size: 14px;
+
+outline: none;
+
+background: #fff;
+
+transition: 0.3s;
+
+}
+
+.followup-form input:focus,
+
+.followup-form select:focus,
+
+.followup-form textarea:focus{
+
+border-color: #4f46e5;
+
+box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+
+}
+
+.followup-form textarea{
+
+min-width: 260px;
+
+min-height: 70px;
+
+resize: none;
+
+font-family: inherit;
+
+}
+
+.followup-form button{
+
+background: linear-gradient(
+135deg,
+#4f46e5,
+#6c63ff
+);
+
+color: white;
+
+border: none;
+
+padding: 12px 22px;
+
+border-radius: 10px;
+
+font-size: 14px;
+
+font-weight: 600;
+
+cursor: pointer;
+
+transition: 0.3s;
+
+box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+
+}
+
+.followup-form button:hover{
+
+transform: translateY(-2px);
+
+opacity: 0.95;
+
+}
+
+/* ================= FOLLOWUP HISTORY ================= */
+
+.followup-item{
+
+background: #f8f9ff;
+
+padding: 16px;
+
+border-radius: 12px;
+
+margin-top: 15px;
+
+border-left: 5px solid #4f46e5;
+
+box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+
+}
+
+.followup-item p{
+
+margin: 8px 0;
+
+font-size: 14px;
+
+color: #333;
+
+}
+
+.followup-item hr{
+
+margin-top: 14px;
+
+border: none;
+
+border-top: 1px solid #ddd;
+
+}
