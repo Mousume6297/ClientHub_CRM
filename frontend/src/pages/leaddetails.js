@@ -102,7 +102,6 @@ useEffect(() => {
 
   fetchFollowups();
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [id, fetchFollowups]);
 
   // ================= ADD NOTE =================

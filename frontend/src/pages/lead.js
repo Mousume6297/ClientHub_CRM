@@ -91,7 +91,7 @@ useEffect(() => {
     fetchLeads();
 
     fetchUsers();
- // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
 }, [fetchLeads, fetchUsers]);
 
   // ================= DELETE LEAD =================
