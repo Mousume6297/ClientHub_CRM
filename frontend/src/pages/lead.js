@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Sidebar from "../components/sidebar";
@@ -28,7 +28,7 @@ function Leads() {
     currentRole === "viewer";
 
   // ================= FETCH LEADS =================
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
 
     try {
 
@@ -62,10 +62,10 @@ function Leads() {
 
     }
 
-  };
+  }, []);
 
   // ================= FETCH USERS =================
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
 
     try {
 
@@ -83,7 +83,7 @@ function Leads() {
 
     }
 
-  };
+  }, []);
 
 
 useEffect(() => {

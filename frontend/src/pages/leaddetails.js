@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Sidebar from "../components/sidebar";
@@ -47,7 +47,7 @@ function LeadDetails() {
     useState("");
 
   // ================= FETCH FOLLOWUPS =================
-  const fetchFollowups = async () => {
+  const fetchFollowups = useCallback(async () => {
 
     try {
 
@@ -67,7 +67,7 @@ function LeadDetails() {
 
     }
 
-  };
+  }, []);
 
   // ================= FETCH LEAD =================
 useEffect(() => {
