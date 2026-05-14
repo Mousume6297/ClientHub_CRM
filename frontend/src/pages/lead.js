@@ -85,13 +85,14 @@ function Leads() {
 
   };
 
-  useEffect(() => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
 
     fetchLeads();
 
     fetchUsers();
 
-}, [fetchLeads, fetchUsers]);
+}, []);
 
   // ================= DELETE LEAD =================
   const deleteLead = async (id) => {
