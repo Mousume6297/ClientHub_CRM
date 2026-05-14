@@ -70,7 +70,6 @@ function LeadDetails() {
   };
 
   // ================= FETCH LEAD =================
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
 
   fetch(`http://localhost:5000/api/leads/${id}`)
@@ -103,8 +102,8 @@ useEffect(() => {
 
   fetchFollowups();
 
-
-}, [id]);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [id, fetchFollowups]);
 
   // ================= ADD NOTE =================
   const addNote = () => {
