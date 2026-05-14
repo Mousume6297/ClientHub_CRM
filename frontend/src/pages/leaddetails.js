@@ -71,53 +71,41 @@ function LeadDetails() {
 
   // ================= FETCH LEAD =================
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
+useEffect(() => {
 
-    fetch(`http://localhost:5000/api/leads/${id}`)
+  fetch(`http://localhost:5000/api/leads/${id}`)
 
-      .then((res) => res.json())
+    .then((res) => res.json())
 
-      .then((data) => {
+    .then((data) => {
 
-        setLead(data);
+      setLead(data);
 
-        // ✅ NOTES
-        setNotes(
+      setNotes(
+        data.notes
+          ?
+          data.notes.split(",")
+          :
+          []
+      );
 
-          data.notes
+      setHistory(
+        data.history
+          ?
+          data.history.split("\n")
+          :
+          []
+      );
 
-            ?
+    })
 
-            data.notes.split(",")
+    .catch((err) => console.log(err));
 
-            :
+  fetchFollowups();
 
-            []
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
-        );
-
-        // ✅ FIX HISTORY
-        setHistory(
-
-          data.history
-
-            ?
-
-            data.history.split("\n")
-
-            :
-
-            []
-
-        );
-
-      })
-
-      .catch((err) => console.log(err));
-
-    fetchFollowups();
-
-  }, [id]);
+}, [id]);
 
   // ================= ADD NOTE =================
   const addNote = () => {

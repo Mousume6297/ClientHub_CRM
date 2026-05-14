@@ -91,7 +91,7 @@ function Leads() {
 
     fetchUsers();
 
-  }, []);
+}, [fetchLeads, fetchUsers]);
 
   // ================= DELETE LEAD =================
   const deleteLead = async (id) => {
